@@ -1,6 +1,6 @@
 # Prompt Central 🤖
 
-PromptCentral is a simple web application that allows users to share and explore ai prompts
+Prompt Central is a simple web application that allows users to share and explore ai prompts
 
 ## License
 

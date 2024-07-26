@@ -1,8 +1,9 @@
 import "../styles/global.css";
+import Nav from "@/components/Nav";
 
 export const metadata = {
 	title: "Prompt Central",
-	description: "Discover and share AI promts.",
+	description: "Discover and share AI prompts.",
 };
 
 export default function RootLayout({
@@ -16,7 +17,10 @@ export default function RootLayout({
 				<div className="main">
 					<div className="gradient" />
 				</div>
-				<main className="app">{children}</main>
+				<main className="app">
+					<Nav />
+					{children}
+				</main>
 			</body>
 		</html>
 	);
