@@ -1,5 +1,6 @@
-import "../styles/global.css";
-import Nav from "@/components/Nav";
+import "@styles/global.css";
+import Provider from "@components/Provider";
+import Nav from "@components/Nav";
 
 export const metadata = {
 	title: "Prompt Central",
@@ -14,13 +15,15 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body>
-				<div className="main">
-					<div className="gradient" />
-				</div>
-				<main className="app">
-					<Nav />
-					{children}
-				</main>
+				<Provider>
+					<div className="main">
+						<div className="gradient" />
+					</div>
+					<main className="app">
+						<Nav />
+						{children}
+					</main>
+				</Provider>
 			</body>
 		</html>
 	);
