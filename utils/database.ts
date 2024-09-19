@@ -9,11 +9,14 @@ export const connectToDb = async () => {
 		return;
 	}
 
+	const mongoUri = process.env.MONGODB_URI;
+	if (!mongoUri) {
+		throw new Error("MONGODB_URI is not defined in the environment variables");
+	}
+
 	try {
-		await mongoose.connect(process.env.MONGODB_URI, {
+		await mongoose.connect(mongoUri, {
 			dbName: "prompt-central",
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
 		});
 		isConnected = true;
 		console.log("MongoDB connected");

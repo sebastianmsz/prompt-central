@@ -8,22 +8,14 @@ import {
 	signOut,
 	useSession,
 	getProviders,
-	LiteralUnion,
 	ClientSafeProvider,
 } from "next-auth/react";
-import { BuiltInProviderType } from "next-auth/providers";
-
-interface Session {
-	user?: {
-		image?: string;
-	};
-}
 
 const Nav = () => {
-	const { data: session } = useSession() as { data: Session | null };
+	const { data: session } = useSession();
 
 	const [providers, setProviders] = useState<Record<
-		LiteralUnion<BuiltInProviderType, string>,
+		string,
 		ClientSafeProvider
 	> | null>(null);
 	const [toggleDropdown, setToggleDropdown] = useState<boolean>(false);
@@ -45,7 +37,7 @@ const Nav = () => {
 					height={30}
 					className="object-contain"
 				/>
-				<p className="logo_text">Promptopia</p>
+				<p className="logo_text">Prompt Central</p>
 			</Link>
 
 			<div className="sm:flex hidden">
@@ -55,13 +47,13 @@ const Nav = () => {
 							Create Post
 						</Link>
 
-						<button type="button" onClick={signOut} className="outline_btn">
+						<button onClick={() => signOut()} className="outline_btn">
 							Sign Out
 						</button>
 
 						<Link href="/profile">
 							<Image
-								src={session?.user.image || "/default-profile.png"}
+								src={session.user.image || "/default-profile.png"}
 								width={37}
 								height={37}
 								className="rounded-full"
@@ -76,9 +68,7 @@ const Nav = () => {
 								<button
 									type="button"
 									key={provider.name}
-									onClick={() => {
-										signIn(provider.id);
-									}}
+									onClick={() => signIn(provider.id)}
 									className="black_btn"
 								>
 									Sign in
@@ -92,7 +82,7 @@ const Nav = () => {
 				{session?.user ? (
 					<div className="flex">
 						<Image
-							src={session?.user.image || "/default-profile.png"}
+							src={session.user.image || "/default-profile.png"}
 							width={37}
 							height={37}
 							className="rounded-full"
@@ -136,9 +126,7 @@ const Nav = () => {
 								<button
 									type="button"
 									key={provider.name}
-									onClick={() => {
-										signIn(provider.id);
-									}}
+									onClick={() => signIn(provider.id)}
 									className="black_btn"
 								>
 									Sign in

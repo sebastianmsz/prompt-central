@@ -15,7 +15,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body>
-				<Provider>
+				<Provider session={null}>
 					<div className="main">
 						<div className="gradient" />
 					</div>
