@@ -1,4 +1,5 @@
 import "@styles/global.css";
+import React from "react";
 import Provider from "@components/Provider";
 import Nav from "@components/Nav";
 
