@@ -1,32 +1,28 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
 	signIn,
 	signOut,
 	useSession,
 	getProviders,
-	LiteralUnion,
 	ClientSafeProvider,
 } from "next-auth/react";
-import { BuiltInProviderType } from "next-auth/providers";
-
-interface Session {
-	user?: {
-		image?: string;
-	};
-}
 
 const Nav = () => {
-	const { data: session } = useSession() as { data: Session | null };
-
+	const { data: session } = useSession();
 	const [providers, setProviders] = useState<Record<
-		LiteralUnion<BuiltInProviderType, string>,
+		string,
 		ClientSafeProvider
 	> | null>(null);
-	const [toggleDropdown, setToggleDropdown] = useState<boolean>(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+	const toggleMenu = useCallback(() => {
+		setIsMenuOpen((prev) => !prev);
+	}, []);
 
 	useEffect(() => {
 		(async () => {
@@ -36,16 +32,15 @@ const Nav = () => {
 	}, []);
 
 	return (
-		<nav className="flex-between w-full mb-16 pt-3">
+		<nav className="flex justify-between items-center w-full mb-16 pt-3">
 			<Link href="/" className="flex gap-2 flex-center">
 				<Image
-					src="/assets/images/logo.svg"
-					alt="logo"
+					src="/assets/img/logo.svg"
+					alt="Prompt Central Logo"
 					width={30}
 					height={30}
-					className="object-contain"
 				/>
-				<p className="logo_text">Promptopia</p>
+				<p className="logo_text">Prompt Central</p>
 			</Link>
 
 			<div className="sm:flex hidden">
@@ -54,18 +49,20 @@ const Nav = () => {
 						<Link href="/create-prompt" className="black_btn">
 							Create Post
 						</Link>
-
-						<button type="button" onClick={signOut} className="outline_btn">
+						<button
+							type="button"
+							onClick={() => signOut()}
+							className="outline_btn"
+						>
 							Sign Out
 						</button>
-
 						<Link href="/profile">
 							<Image
-								src={session?.user.image || "/default-profile.png"}
+								src={session.user.image || "/assets/img/default-user.png"}
 								width={37}
 								height={37}
 								className="rounded-full"
-								alt="profile"
+								alt="Profile"
 							/>
 						</Link>
 					</div>
@@ -76,12 +73,16 @@ const Nav = () => {
 								<button
 									type="button"
 									key={provider.name}
-									onClick={() => {
-										signIn(provider.id);
-									}}
-									className="black_btn"
+									onClick={() => signIn(provider.id)}
+									className="black_btn flex items-center gap-2"
 								>
-									Sign in
+									<Image
+										src={`/assets/img/${provider.name}.svg`}
+										alt="Provider Icon"
+										width={20}
+										height={20}
+									/>
+									Sign in with {provider.name}
 								</button>
 							))}
 					</>
@@ -92,34 +93,34 @@ const Nav = () => {
 				{session?.user ? (
 					<div className="flex">
 						<Image
-							src={session?.user.image || "/default-profile.png"}
+							src={session.user.image || "/assets/img/default-user.svg"}
 							width={37}
 							height={37}
 							className="rounded-full"
-							alt="profile"
-							onClick={() => setToggleDropdown(!toggleDropdown)}
+							alt="Profile"
+							onClick={toggleMenu}
 						/>
 
-						{toggleDropdown && (
+						{isMenuOpen && (
 							<div className="dropdown">
 								<Link
 									href="/profile"
 									className="dropdown_link"
-									onClick={() => setToggleDropdown(false)}
+									onClick={() => setIsMenuOpen(false)}
 								>
 									My Profile
 								</Link>
 								<Link
 									href="/create-prompt"
 									className="dropdown_link"
-									onClick={() => setToggleDropdown(false)}
+									onClick={() => setIsMenuOpen(false)}
 								>
 									Create Prompt
 								</Link>
 								<button
 									type="button"
 									onClick={() => {
-										setToggleDropdown(false);
+										setIsMenuOpen(false);
 										signOut();
 									}}
 									className="mt-5 w-full black_btn"
@@ -136,12 +137,10 @@ const Nav = () => {
 								<button
 									type="button"
 									key={provider.name}
-									onClick={() => {
-										signIn(provider.id);
-									}}
+									onClick={() => signIn(provider.id)}
 									className="black_btn"
 								>
-									Sign in
+									Sign in with {provider.name}
 								</button>
 							))}
 					</>

@@ -1,49 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import React from "react";
+import { useState, FormEvent } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
 import Form from "@components/Form";
-import { Router } from "next/router";
+import { Post } from "@types";
+import { Session } from "next-auth";
 
 const CreatePrompt = () => {
 	const router = useRouter();
-	const { data: session } = useSession();
+	const { data: session } = useSession() as { data: Session | null };
 
-	const [submitting, setsubmitting] = useState(false);
-	const [post, setPost] = useState({
+	const [submitting, setSubmitting] = useState<boolean>(false);
+	const [post, setPost] = useState<Partial<Post>>({
 		prompt: "",
 		tag: "",
 	});
-	const createPrompt = async (e) => {
+
+	const createPrompt = async (e: FormEvent) => {
 		e.preventDefault();
-		setsubmitting(true);
+		setSubmitting(true);
 		try {
 			const response = await fetch("/api/prompt/new", {
 				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
 				body: JSON.stringify({
 					prompt: post.prompt,
-					userId: session?.user.id,
+					userId: session?.user?.id,
 					tag: post.tag,
 				}),
 			});
 
 			if (response.ok) {
 				router.push("/");
+			} else {
+				console.error("Failed to create prompt:", await response.text());
 			}
 		} catch (error) {
-			console.log(error);
+			console.error("An error occurred:", error);
 		} finally {
-			setsubmitting(false);
+			setSubmitting(false);
 		}
 	};
 
 	return (
 		<Form
 			type="Create"
-			post={post}
-			setPost={setPost}
+			post={post as Post}
+			setPost={(updatedPost) => setPost(updatedPost)}
 			submitting={submitting}
 			handleSubmit={createPrompt}
 		/>

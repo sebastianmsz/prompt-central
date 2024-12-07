@@ -1,6 +1,8 @@
 import "@styles/global.css";
+import React from "react";
 import Provider from "@components/Provider";
 import Nav from "@components/Nav";
+import ErrorBoundary from "@components/ErrorBoundary";
 
 export const metadata = {
 	title: "Prompt Central",
@@ -21,7 +23,7 @@ export default function RootLayout({
 					</div>
 					<main className="app">
 						<Nav />
-						{children}
+						<ErrorBoundary>{children}</ErrorBoundary>
 					</main>
 				</Provider>
 			</body>

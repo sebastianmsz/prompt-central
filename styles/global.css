@@ -26,7 +26,7 @@
 
 .main:after {
 	content: "";
-	background-image: url("/assets/images/grid.svg");
+	background-image: url("/assets/img/grid.svg");
 	z-index: 1;
 	position: absolute;
 	width: 100%;
@@ -99,24 +99,12 @@
 	@apply mt-5 text-lg text-gray-600 sm:text-xl max-w-2xl;
 }
 
-.search_input {
-	@apply block w-full rounded-md border border-gray-200 bg-white py-2.5 font-satoshi pl-5 pr-12 text-sm shadow-lg font-medium focus:border-black focus:outline-none focus:ring-0;
-}
-
-.copy_btn {
-	@apply w-7 h-7 rounded-full bg-white/10 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur flex justify-center items-center cursor-pointer;
-}
-
 .glassmorphism {
 	@apply rounded-xl border border-gray-200 bg-white/20 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur p-5;
 }
 
 .prompt_layout {
 	@apply space-y-6 py-8 sm:columns-2 sm:gap-6 xl:columns-3;
-}
-
-.feed {
-	@apply mt-16 mx-auto w-full max-w-xl flex justify-center items-center flex-col gap-2;
 }
 
 .form_textarea {
@@ -157,4 +145,8 @@
 
 .flex-between {
 	@apply flex justify-between items-center;
+}
+
+.loading-spinner {
+	@apply border-4 border-t-amber-500 border-gray-200 rounded-full w-20 h-20 mx-auto my-4 animate-spin;
 }
