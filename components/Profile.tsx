@@ -25,10 +25,10 @@ const Profile: React.FC<ProfileProps> = ({
 		() =>
 			data.map((prompt) => (
 				<PromptCard
-					key={prompt.id} // Ensure 'id' is the correct unique identifier
+					key={prompt._id}
 					post={prompt}
-					handleEdit={() => handleEdit(prompt.id)}
-					handleDelete={() => handleDelete(prompt.id)}
+					handleEdit={() => handleEdit(prompt._id || "")}
+					handleDelete={() => handleDelete(prompt._id || "")}
 					handleTagClick={handleTagClick}
 				/>
 			)),

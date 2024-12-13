@@ -11,8 +11,10 @@ export async function GET() {
 	} catch (error) {
 		console.error("Error fetching prompts:", error);
 
-		const errorMessage =
-			error instanceof Error ? error.message : "An unknown error occurred";
+		let errorMessage = "An unknown error occurred";
+		if (error instanceof Error) {
+			errorMessage = error.message;
+		}
 
 		return NextResponse.json(
 			{ error: "Failed to fetch prompts", details: errorMessage },

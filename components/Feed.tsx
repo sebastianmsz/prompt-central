@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import PromptCard from "./PromptCard";
 import { useInView } from "react-intersection-observer";
 import { Post } from "@types";
-import React from "react";
+import React, { ChangeEvent } from "react";
 import Spinner from "./Spinner";
 
 const ITEMS_PER_PAGE = 10;
@@ -18,6 +18,8 @@ const Feed = () => {
 
 	const fetchPrompts = useCallback(async (pageNum: number) => {
 		try {
+			setLoading(true);
+			setError(null);
 			const response = await fetch(
 				`/api/prompt?page=${pageNum}&limit=${ITEMS_PER_PAGE}`,
 			);
@@ -26,15 +28,18 @@ const Feed = () => {
 			const data: Post[] = await response.json();
 			setPrompts((prev) => (pageNum === 1 ? data : [...prev, ...data]));
 			setHasMore(data.length === ITEMS_PER_PAGE);
-		} catch (err) {
-			setError(err instanceof Error ? err.message : "Something went wrong");
+		} catch (err: unknown) {
+			let errorMessage = "An unknown error occurred";
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			setError(errorMessage);
 		} finally {
 			setLoading(false);
 		}
 	}, []);
 
 	useEffect(() => {
-		setLoading(true);
 		fetchPrompts(page);
 	}, [fetchPrompts, page]);
 
@@ -48,6 +53,14 @@ const Feed = () => {
 		console.log(`Tag clicked: ${tag}`);
 	}, []);
 
+	const handleEdit = useCallback((id: string) => {
+		console.log(`Edit clicked: ${id}`);
+	}, []);
+
+	const handleDelete = useCallback((id: string) => {
+		console.log(`Delete clicked: ${id}`);
+	}, []);
+
 	const memoizedPromptCards = useMemo(
 		() =>
 			prompts.map((prompt) => (
@@ -55,13 +68,15 @@ const Feed = () => {
 					key={prompt._id}
 					post={prompt}
 					handleTagClick={handleTagClick}
+					handleEdit={() => handleEdit(prompt._id || "")}
+					handleDelete={() => handleDelete(prompt._id || "")}
 				/>
 			)),
-		[prompts, handleTagClick],
+		[prompts, handleTagClick, handleEdit, handleDelete],
 	);
 
 	const [searchText, setSearchText] = useState("");
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setSearchText(e.target.value);
 	};
 

@@ -5,9 +5,14 @@ import { useSession } from "next-auth/react";
 import Profile from "@components/Profile";
 import { Post } from "@types";
 import { useRouter } from "next/navigation";
+import { Session } from "next-auth";
+import Spinner from "@components/Spinner";
 
 const MyProfile = () => {
-	const { data: session } = useSession();
+	const { data: session, status } = useSession() as {
+		data: Session | null;
+		status: string;
+	};
 	const router = useRouter();
 	const [myPosts, setMyPosts] = useState<Post[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -17,23 +22,33 @@ const MyProfile = () => {
 		router.push(`/update-prompt?id=${post}`);
 	};
 
-	const handleDelete = async (post: string) => {
-		const hasConfirmed = confirm("Are you sure you want to delete this post?");
-		if (hasConfirmed) {
-			try {
-				await fetch(`/api/prompt/${post}`, {
-					method: "DELETE",
-				});
-				const filteredPosts = myPosts.filter((item) => item.id !== post);
-				setMyPosts(filteredPosts);
-			} catch (err: any) {
-				console.error(err);
-				setError(err.message);
+	const handleDelete = async (postId: string) => {
+		try {
+			const response = await fetch(`/api/prompt/${postId}`, {
+				method: "DELETE",
+			});
+
+			if (response.ok) {
+				setMyPosts((prevPosts) =>
+					prevPosts.filter((post) => post._id !== postId),
+				);
+			} else {
+				const message = `An error has occurred: ${response.status}`;
+				throw new Error(message);
 			}
+		} catch (err: unknown) {
+			let errorMessage = "An unknown error occurred";
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			console.error(err);
+			setError(errorMessage);
 		}
 	};
 
 	const fetchUserPrompts = useCallback(async () => {
+		setLoading(true);
+		setError(null);
 		if (session?.user?.id) {
 			try {
 				const response = await fetch(`/api/users/${session.user.id}/posts`);
@@ -41,11 +56,15 @@ const MyProfile = () => {
 					const message = `An error has occurred: ${response.status}`;
 					throw new Error(message);
 				}
-				const data = await response.json();
+				const data: Post[] = await response.json();
 				setMyPosts(data);
-			} catch (err: any) {
+			} catch (err: unknown) {
+				let errorMessage = "An unknown error occurred";
+				if (err instanceof Error) {
+					errorMessage = err.message;
+				}
 				console.error("Error fetching prompts:", err);
-				setError(err.message);
+				setError(errorMessage);
 			} finally {
 				setLoading(false);
 			}
@@ -59,7 +78,7 @@ const MyProfile = () => {
 	}, [fetchUserPrompts]);
 
 	if (loading) {
-		return <p>Loading</p>;
+		return <Spinner />;
 	}
 	if (error) {
 		return <p>Error: {error}</p>;

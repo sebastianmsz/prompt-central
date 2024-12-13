@@ -19,12 +19,16 @@ declare module "next-auth" {
 
 export interface Post {
 	_id?: string;
+	id?: string;
 	prompt: string;
 	tag: string;
 	creator?: User | null;
 }
 
-export type CreatePost = Omit<Post, "_id" | "creator">;
+export type CreatePost = {
+	prompt?: string;
+	tag?: string;
+};
 
 export interface FeedProps {
 	handleTagClick: (tag: string) => void;
@@ -33,6 +37,8 @@ export interface FeedProps {
 export interface PromptCardListProps {
 	post: Post;
 	handleTagClick?: (tag: string) => void;
+	handleEdit?: () => void;
+	handleDelete?: () => void;
 }
 
 export interface FormProps {
