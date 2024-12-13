@@ -35,6 +35,8 @@ const handler = NextAuth({
 				user: {
 					...session.user,
 					id: sessionUser._id.toString(),
+					username: sessionUser.username,
+					image: sessionUser.image,
 				},
 			};
 		},

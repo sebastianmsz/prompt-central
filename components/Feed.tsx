@@ -4,6 +4,7 @@ import PromptCard from "./PromptCard";
 import { useInView } from "react-intersection-observer";
 import { Post } from "@types";
 import React from "react";
+import Spinner from "./Spinner";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -33,6 +34,7 @@ const Feed = () => {
 	}, []);
 
 	useEffect(() => {
+		setLoading(true);
 		fetchPrompts(page);
 	}, [fetchPrompts, page]);
 
@@ -86,9 +88,7 @@ const Feed = () => {
 			<div className="grid w-full max-w-6xl gap-6 mt-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-min">
 				{memoizedPromptCards}
 			</div>
-			{loading && (
-				<div className="w-16 h-16 my-8 border-4 border-t-amber-500 border-gray-200 rounded-full animate-spin" />
-			)}
+			{loading && <Spinner />}
 			<div ref={ref} className="h-8" />
 			{error && <div className="mt-4 text-red-500">{error}</div>}
 		</div>

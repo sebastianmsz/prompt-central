@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useState, FormEvent } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,16 @@ import { Session } from "next-auth";
 
 const CreatePrompt = () => {
 	const router = useRouter();
-	const { data: session } = useSession() as { data: Session | null };
+	const { data: session, status } = useSession() as {
+		data: Session | null;
+		status: string;
+	};
+
+	useEffect(() => {
+		if (status !== "loading" && !session) {
+			router.push("/api/auth/signin");
+		}
+	}, [session, status, router]);
 
 	const [submitting, setSubmitting] = useState<boolean>(false);
 	const [post, setPost] = useState<Partial<Post>>({
