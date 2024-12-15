@@ -1,24 +1,15 @@
-import {
-	Session,
-	User as NextAuthUser,
-	Profile as NextAuthProfile,
-} from "next-auth";
+import { Session, User } from "next-auth";
 
 declare module "next-auth" {
 	interface Session {
 		user: User;
 	}
-	interface User extends NextAuthUser {
-		username: string;
-	}
-	interface Profile extends NextAuthProfile {
-		username?: string;
-		picture?: string;
+	interface Profile {
+		picture: string;
 	}
 }
 
 export interface Post {
-	_id?: string;
 	id?: string;
 	prompt: string;
 	tag: string;

@@ -3,7 +3,6 @@ import GoogleProvider from "next-auth/providers/google";
 import User from "@models/user";
 import { connectToDb } from "@utils/database";
 import { Session, Profile } from "next-auth";
-import { User as NextAuthUser } from "next-auth";
 
 const handler = NextAuth({
 	session: {
@@ -31,7 +30,7 @@ const handler = NextAuth({
 				user: {
 					...session.user,
 					id: sessionUser._id.toString(),
-					username: sessionUser.username,
+					name: sessionUser.name,
 					image: sessionUser.image,
 				},
 			};
@@ -42,16 +41,16 @@ const handler = NextAuth({
 				if (profile && profile.email) {
 					const userExists = await User.findOne({ email: profile.email });
 					if (!userExists) {
-						let username =
+						let name =
 							profile.name?.replace(/[^a-zA-Z0-9]/g, "").toLowerCase() ||
 							profile.email.split("@")[0];
 						const userCount = await User.countDocuments({});
 						if (userCount > 0) {
-							username += userCount;
+							name += userCount;
 						}
 						await User.create({
 							email: profile.email,
-							username: username,
+							name: name,
 							image: profile.picture,
 						});
 					}

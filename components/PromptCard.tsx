@@ -37,8 +37,8 @@ const PromptCard: React.FC<Props> = ({
 		setIsModalOpen(false);
 		setDeleting(true);
 		try {
-			if (post._id) {
-				await handleDelete?.(post._id);
+			if (post.id) {
+				await handleDelete?.(post.id);
 			} else {
 				throw new Error("Post id is missing");
 			}
@@ -73,7 +73,7 @@ const PromptCard: React.FC<Props> = ({
 					/>
 					<div className="flex flex-col">
 						<h3 className="font-satoshi font-semibold text-gray-900 truncate">
-							{post.creator?.username || "Unknown User"}
+							{post.creator?.name || "Unknown User"}
 						</h3>
 						<p className="font-inter text-sm text-gray-500 break-words max-w-full">
 							{post.creator?.email || "No email"}

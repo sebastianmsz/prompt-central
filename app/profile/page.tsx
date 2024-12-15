@@ -30,7 +30,7 @@ const MyProfile = () => {
 
 			if (response.ok) {
 				setMyPosts((prevPosts) =>
-					prevPosts.filter((post) => post._id !== postId),
+					prevPosts.filter((post) => post.id !== postId),
 				);
 			} else {
 				const message = `An error has occurred: ${response.status}`;
@@ -89,8 +89,8 @@ const MyProfile = () => {
 
 	return (
 		<Profile
-			name={session.user.username}
-			desc="Welcome to your personalized profile page"
+			name={session.user.name || "Unknown"}
+			desc={`Welcome back, ${session.user.name}`}
 			data={myPosts}
 			handleEdit={handleEdit}
 			handleDelete={handleDelete}
