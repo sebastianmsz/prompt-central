@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useState, FormEvent } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Form from "@components/Form";
 import { Post } from "@types";
@@ -18,8 +18,8 @@ const CreatePrompt = () => {
 	};
 
 	useEffect(() => {
-		if (status !== "loading" && !session) {
-			router.push("/auth/signin");
+		if (status !== "loading" && status !== "authenticated") {
+			signIn("google");
 		}
 	}, [session, status, router]);
 

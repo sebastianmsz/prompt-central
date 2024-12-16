@@ -30,7 +30,7 @@ const MyProfile = () => {
 
 			if (response.ok) {
 				setMyPosts((prevPosts) =>
-					prevPosts.filter((post) => post.id !== postId),
+					prevPosts.filter((post) => post._id !== postId),
 				);
 			} else {
 				const message = `An error has occurred: ${response.status}`;
@@ -95,6 +95,8 @@ const MyProfile = () => {
 			handleEdit={handleEdit}
 			handleDelete={handleDelete}
 			key={session.user.id}
+			isCurrentUserProfile={true}
+			isProfilePage={true}
 		/>
 	);
 };

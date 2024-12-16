@@ -1,14 +1,13 @@
 import { connectToDb } from "@utils/database";
 import Prompt from "@models/prompt";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
-export async function DELETE(
-	request: Request,
-	{ params }: { params: { id: string } },
-) {
+export async function DELETE(request: NextRequest) {
 	try {
 		await connectToDb();
-		const { id } = params;
+
+		const url = new URL(request.url);
+		const id = url.searchParams.get("id");
 
 		const deletedPrompt = await Prompt.findByIdAndDelete(id);
 

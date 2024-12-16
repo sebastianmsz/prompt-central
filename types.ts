@@ -2,34 +2,36 @@ import { Session, User } from "next-auth";
 
 declare module "next-auth" {
 	interface Session {
-		user: User;
+		user: User & { _id: string };
+	}
+	interface User {
+		_id: string;
 	}
 	interface Profile {
-		picture: string;
+		picture?: string;
 	}
 }
 
 export interface Post {
-	id?: string;
+	_id?: string;
 	prompt: string;
 	tag: string;
 	creator?: User | null;
 }
 
-export type CreatePost = {
-	prompt?: string;
-	tag?: string;
-};
+export type CreatePost = Partial<Post>;
 
 export interface FeedProps {
 	handleTagClick: (tag: string) => void;
 }
 
-export interface PromptCardListProps {
+export interface PromptCardProps {
 	post: Post;
-	handleTagClick?: (tag: string) => void;
-	handleEdit?: () => void;
-	handleDelete?: () => void;
+	handleEdit: () => void;
+	handleDelete: () => void;
+	handleTagClick: (tag: string) => void;
+	isCurrentUserProfile: boolean;
+	isProfilePage: boolean;
 }
 
 export interface FormProps {
@@ -40,7 +42,29 @@ export interface FormProps {
 	handleSubmit: (e: React.FormEvent) => void;
 }
 
-export interface ProviderProps {
-	session: Session | null | undefined;
-	children: React.ReactNode;
+export type ProviderProps = React.PropsWithChildren<{
+	session?: Session | null;
+}>;
+
+export interface UserProfileParams {
+	[key: string]: string;
+	id: string;
+}
+
+export interface ModalProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onConfirm: () => void;
+	title: string;
+	message: string;
+}
+
+export interface ProfileProps {
+	name: string;
+	desc: string;
+	data: Post[];
+	isCurrentUserProfile: boolean;
+	handleEdit: (id: string) => void;
+	handleDelete: (id: string) => void;
+	isProfilePage: boolean;
 }

@@ -70,6 +70,7 @@ const Feed = () => {
 					handleTagClick={handleTagClick}
 					handleEdit={() => handleEdit(prompt._id || "")}
 					handleDelete={() => handleDelete(prompt._id || "")}
+					userId={prompt.creator?.id}
 				/>
 			)),
 		[prompts, handleTagClick, handleEdit, handleDelete],

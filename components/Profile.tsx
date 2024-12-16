@@ -1,21 +1,15 @@
 import React, { useMemo, useCallback } from "react";
 import PromptCard from "./PromptCard";
-import { Post } from "@types";
-
-interface ProfileProps {
-	name: string;
-	desc: string;
-	data: Post[];
-	handleEdit: (id: string) => void;
-	handleDelete: (id: string) => void;
-}
+import { Post, ProfileProps } from "@types";
 
 const Profile: React.FC<ProfileProps> = ({
 	name,
 	desc,
 	data,
+	isCurrentUserProfile,
 	handleEdit,
 	handleDelete,
+	isProfilePage,
 }) => {
 	const handleTagClick = useCallback((tag: string) => {
 		console.log(`Tag clicked: ${tag}`);
@@ -30,9 +24,18 @@ const Profile: React.FC<ProfileProps> = ({
 					handleEdit={() => handleEdit(prompt._id || "")}
 					handleDelete={() => handleDelete(prompt._id || "")}
 					handleTagClick={handleTagClick}
+					isCurrentUserProfile={isCurrentUserProfile}
+					isProfilePage={isProfilePage}
 				/>
 			)),
-		[data, handleEdit, handleDelete, handleTagClick],
+		[
+			data,
+			handleEdit,
+			handleDelete,
+			handleTagClick,
+			isCurrentUserProfile,
+			isProfilePage,
+		],
 	);
 
 	return (
