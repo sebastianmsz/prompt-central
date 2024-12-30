@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import User from "@models/user";
 import { connectToDb } from "@utils/database";
-import { Session, Profile, User as NextAuthUser } from "next-auth";
+import { Session, Profile } from "next-auth";
 
 const handler = NextAuth({
 	session: {
@@ -17,14 +17,12 @@ const handler = NextAuth({
 		}),
 	],
 	callbacks: {
-		async session({
-			session,
-		}: {
-			session: Session;
-			user: NextAuthUser;
-		}): Promise<Session> {
+		async session({ session }: { session: Session }): Promise<Session> {
 			await connectToDb();
-			const sessionUser = await User.findOne({ email: session.user?.email });
+			if (!session.user?.email) {
+				throw new Error("Session does not have a user email");
+			}
+			const sessionUser = await User.findOne({ email: session.user.email });
 
 			if (!sessionUser) {
 				throw new Error("User not found in database");
@@ -35,6 +33,8 @@ const handler = NextAuth({
 				user: {
 					...session.user,
 					id: sessionUser._id.toString(),
+					name: sessionUser.name,
+					image: sessionUser.image,
 				},
 			};
 		},
@@ -44,16 +44,16 @@ const handler = NextAuth({
 				if (profile && profile.email) {
 					const userExists = await User.findOne({ email: profile.email });
 					if (!userExists) {
-						let username =
+						let name =
 							profile.name?.replace(/[^a-zA-Z0-9]/g, "").toLowerCase() ||
 							profile.email.split("@")[0];
 						const userCount = await User.countDocuments({});
 						if (userCount > 0) {
-							username += userCount;
+							name += userCount;
 						}
 						await User.create({
 							email: profile.email,
-							username: username,
+							name: name,
 							image: profile.picture,
 						});
 					}

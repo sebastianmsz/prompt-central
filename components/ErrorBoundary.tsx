@@ -1,16 +1,18 @@
 "use client";
-import React, { Component, ErrorInfo, ReactNode } from "react";
+import React, { Component, ErrorInfo } from "react";
+import { ErrorBoundaryProps, ErrorBoundaryState} from "@types"
+
 
 class ErrorBoundary extends Component<
-	{ children: ReactNode },
-	{ hasError: boolean }
+	ErrorBoundaryProps,
+	ErrorBoundaryState
 > {
-	constructor(props: { children: ReactNode }) {
+	constructor(props: ErrorBoundaryProps) {
 		super(props);
 		this.state = { hasError: false };
 	}
 
-	static getDerivedStateFromError() {
+	static getDerivedStateFromError(): ErrorBoundaryState {
 		return { hasError: true };
 	}
 

@@ -1,11 +1,24 @@
 import { connectToDb } from "@utils/database";
 import Prompt from "@models/prompt";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
+interface Params {
+	id: string;
+}
 
-export async function GET() {
+export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
 	try {
+		const { id } = await params;
 		await connectToDb();
-		const prompts = await Prompt.find({}).populate("creator");
+        if(!id){
+            return NextResponse.json(
+				{ message: "Missing user id" },
+				{ status: 400 },
+			);
+        }
+
+		const prompts = await Prompt.find({
+			creator: id,
+		}).populate("creator");
 
 		return NextResponse.json(prompts, { status: 200 });
 	} catch (error) {

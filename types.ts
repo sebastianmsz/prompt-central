@@ -1,15 +1,20 @@
 import { Session, User } from "next-auth";
+import { ReactNode } from "react";
 
 declare module "next-auth" {
 	interface Session {
-		user: User;
+		user: User & { id: string };
 	}
 	interface User {
-		username: string;
+		_id: string;
+		name: string;
+        image:string;
+		email: string;
 	}
 	interface Profile {
-		username: string;
-		picture: string; // Add the picture property here
+		picture?: string;
+		name?: string
+		email?:string
 	}
 }
 
@@ -20,15 +25,19 @@ export interface Post {
 	creator?: User | null;
 }
 
-export type CreatePost = Omit<Post, "_id" | "creator">;
+export type CreatePost = Partial<Post>;
 
 export interface FeedProps {
 	handleTagClick: (tag: string) => void;
 }
 
-export interface PromptCardListProps {
+export interface PromptCardProps {
 	post: Post;
-	handleTagClick?: (tag: string) => void;
+	handleTagClick: (tag: string) => void;
+	isCurrentUserProfile: boolean;
+	isProfilePage: boolean;
+	onDelete?: (postId: string) => void;
+	userId?: string;
 }
 
 export interface FormProps {
@@ -39,7 +48,41 @@ export interface FormProps {
 	handleSubmit: (e: React.FormEvent) => void;
 }
 
-export interface ProviderProps {
-	session: Session | null | undefined;
-	children: React.ReactNode;
+export type ProviderProps = React.PropsWithChildren<{
+	session?: Session | null;
+}>;
+
+export interface UserProfileParams {
+	[key: string]: string;
+	id: string;
+}
+
+export interface ModalProps {
+	isOpen: boolean;
+	onClose: () => void;
+	onConfirm: () => void;
+	title: string;
+	message: string;
+}
+
+export interface ProfileProps {
+	name: string;
+	desc: string;
+	data: Post[];
+	isCurrentUserProfile: boolean;
+	isProfilePage: boolean;
+	onDelete?: (postId: string) => void;
+}
+
+export interface UserParams {
+	id: string;
+}
+
+
+export interface ErrorBoundaryProps {
+	children: ReactNode;
+}
+
+export interface ErrorBoundaryState {
+	hasError: boolean;
 }

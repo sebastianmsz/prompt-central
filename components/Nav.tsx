@@ -51,14 +51,14 @@ const Nav = () => {
 						</Link>
 						<button
 							type="button"
-							onClick={() => signOut()}
+							onClick={() => signOut({ callbackUrl: "/" })}
 							className="outline_btn"
 						>
 							Sign Out
 						</button>
-						<Link href="/profile">
+						<Link href={`/profile/${session.user.id}`}>
 							<Image
-								src={session.user.image || "/assets/img/default-user.png"}
+								src={session.user.image || "/assets/img/default-user.svg"}
 								width={37}
 								height={37}
 								className="rounded-full"
@@ -104,7 +104,7 @@ const Nav = () => {
 						{isMenuOpen && (
 							<div className="dropdown">
 								<Link
-									href="/profile"
+									href={`/profile/${session.user.id}`}
 									className="dropdown_link"
 									onClick={() => setIsMenuOpen(false)}
 								>
@@ -121,7 +121,7 @@ const Nav = () => {
 									type="button"
 									onClick={() => {
 										setIsMenuOpen(false);
-										signOut();
+										signOut({ callbackUrl: "/" });
 									}}
 									className="mt-5 w-full black_btn"
 								>
