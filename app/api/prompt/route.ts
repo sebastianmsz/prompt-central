@@ -1,23 +1,56 @@
 import { connectToDb } from "@utils/database";
 import Prompt from "@models/prompt";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
 	try {
 		await connectToDb();
-		const prompts = await Prompt.find({}).populate("creator");
 
-		return NextResponse.json(prompts, { status: 200 });
+		// Get pagination parameters from URL with defaults
+		const DEFAULT_PAGE = 1;
+		const DEFAULT_LIMIT = 12;
+		const searchParams = request.nextUrl.searchParams;
+		const page = Math.max(
+			DEFAULT_PAGE,
+			parseInt(searchParams.get("page") || `${DEFAULT_PAGE}`, 10),
+		);
+		const limit = Math.max(
+			DEFAULT_LIMIT,
+			parseInt(searchParams.get("limit") || `${DEFAULT_LIMIT}`, 10),
+		);
+		const skip = (page - 1) * limit;
+
+		// Get total count and prompts with optional filtering
+		const total = await Prompt.countDocuments({});
+		const prompts = await Prompt.find({})
+			.populate("creator")
+			.skip(skip)
+			.limit(limit);
+
+		// Return paginated results with metadata
+		return NextResponse.json(
+			{
+				prompts,
+				pagination: {
+					total,
+					page,
+					limit,
+					totalPages: Math.ceil(total / limit),
+				},
+			},
+			{ status: 200 },
+		);
 	} catch (error) {
 		console.error("Error fetching prompts:", error);
 
-		let errorMessage = "An unknown error occurred";
-		if (error instanceof Error) {
-			errorMessage = error.message;
-		}
-
+		const errorMessage =
+			error instanceof Error ? error.message : "An unknown error occurred";
 		return NextResponse.json(
-			{ error: "Failed to fetch prompts", details: errorMessage },
+			{
+				error: "Failed to fetch prompts",
+				code: "PROMPT_FETCH_ERROR",
+				details: errorMessage,
+			},
 			{ status: 500 },
 		);
 	}

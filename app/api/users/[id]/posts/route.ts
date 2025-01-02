@@ -1,36 +1,54 @@
 import { connectToDb } from "@utils/database";
 import Prompt from "@models/prompt";
 import { NextResponse, NextRequest } from "next/server";
-interface Params {
-	id: string;
-}
 
-export async function GET(request: NextRequest, { params }: { params: Promise<Params> }) {
+export async function GET(
+	request: NextRequest,
+	{ params }: { params: Promise<{ id: string }> },
+) {
 	try {
 		const { id } = await params;
-		await connectToDb();
-        if(!id){
-            return NextResponse.json(
-				{ message: "Missing user id" },
-				{ status: 400 },
-			);
-        }
+		const DEFAULT_PAGE = 1;
+		const DEFAULT_LIMIT = 12;
+		const searchParams = request.nextUrl.searchParams;
+		const page = Math.max(
+			DEFAULT_PAGE,
+			parseInt(searchParams.get("page") || `${DEFAULT_PAGE}`, 10),
+		);
+		const limit = Math.max(
+			DEFAULT_LIMIT,
+			parseInt(searchParams.get("limit") || `${DEFAULT_LIMIT}`, 10),
+		);
+		const skip = (page - 1) * limit;
 
-		const prompts = await Prompt.find({
-			creator: id,
-		}).populate("creator");
-
-		return NextResponse.json(prompts, { status: 200 });
-	} catch (error) {
-		console.error("Error fetching prompts:", error);
-
-		let errorMessage = "An unknown error occurred";
-		if (error instanceof Error) {
-			errorMessage = error.message;
+		if (!id) {
+			return NextResponse.json({ message: "Missing user ID" }, { status: 400 });
 		}
 
+		await connectToDb();
+
+		const total = await Prompt.countDocuments({ creator: id });
+		const prompts = await Prompt.find({ creator: id })
+			.populate("creator", "name email image")
+			.skip(skip)
+			.limit(limit);
+
+		return NextResponse.json({
+			prompts,
+			pagination: {
+				total,
+				page,
+				limit,
+				totalPages: Math.ceil(total / limit),
+			},
+		});
+	} catch (error: unknown) {
+		console.error("Error fetching user's prompts:", error);
 		return NextResponse.json(
-			{ error: "Failed to fetch prompts", details: errorMessage },
+			{
+				error: "Failed to fetch prompts",
+				details: error instanceof Error ? error.message : "Unknown error",
+			},
 			{ status: 500 },
 		);
 	}

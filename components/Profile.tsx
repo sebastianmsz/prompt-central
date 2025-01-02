@@ -35,7 +35,7 @@ const Profile: React.FC<ProfileProps> = ({
 				<span className="blue_gradient">{name}&#39;s</span> Profile
 			</h1>
 			<p className="desc text-left">{desc}</p>
-			<div className="mt-10 prompt_layout">{memoizedPromptCards}</div>
+			<div className="prompt_layout mt-10">{memoizedPromptCards}</div>
 		</section>
 	);
 };
