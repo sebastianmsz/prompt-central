@@ -5,15 +5,28 @@ import Profile from "@components/Profile";
 import Spinner from "@components/Spinner";
 import { Post } from "@types";
 import { useParams } from "next/navigation";
+import usePromptList from "@app/hooks/usePromptList";
 
 const UserProfile = () => {
 	const { id } = useParams<{ id: string }>();
 	const [user, setUser] = useState<{ name: string } | null>(null);
-	const [posts, setPosts] = useState<Post[]>([]);
-	const [page, setPage] = useState(1);
-	const [totalPages, setTotalPages] = useState(1);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const [userError, setUserError] = useState<string | null>(null);
+
+	const {
+		data: initialPosts,
+		loading,
+		error,
+		page,
+		totalPages,
+		handleLoadMore,
+		refreshData,
+	} = usePromptList<Post>({ apiEndpoint: `/api/users/${id}/posts` });
+
+	const [posts, setPosts] = useState<Post[]>(initialPosts);
+
+	useEffect(() => {
+		setPosts(initialPosts);
+	}, [initialPosts]);
 
 	const fetchUserData = useCallback(async () => {
 		try {
@@ -21,53 +34,42 @@ const UserProfile = () => {
 			if (!response.ok) throw new Error("Failed to fetch user data");
 			const { user } = (await response.json()) as { user: { name: string } };
 			setUser(user);
-		} catch {
-			setError("Failed to load user data.");
+		} catch (err: unknown) {
+			let errorMessage = "Failed to load user data.";
+			if (err instanceof Error) {
+				errorMessage = err.message;
+			}
+			setUserError(errorMessage);
 		}
 	}, [id]);
-
-	const fetchPosts = useCallback(async () => {
-		setLoading(true);
-		try {
-			const response = await fetch(
-				`/api/users/${id}/posts?page=${page}&limit=12`,
-			);
-			if (!response.ok) throw new Error("Failed to fetch posts");
-			const data = await response.json();
-			setPosts((prev) =>
-				page === 1 ? data.prompts : [...prev, ...data.prompts],
-			);
-			setTotalPages(data.pagination.totalPages);
-		} catch {
-			setError("Failed to load posts.");
-		} finally {
-			setLoading(false);
-		}
-	}, [id, page]);
 
 	useEffect(() => {
 		fetchUserData();
 	}, [fetchUserData]);
 
-	useEffect(() => {
-		fetchPosts();
-	}, [fetchPosts]);
-
-	const handleLoadMore = useCallback(() => {
-		if (page < totalPages && !loading) {
-			setPage((prev) => prev + 1);
-		}
-	}, [page, totalPages, loading]);
+	const handleDelete = useCallback(
+		(postId: string, optimistic?: boolean) => {
+			if (optimistic) {
+				setPosts((prevPosts) =>
+					prevPosts.filter((post) => post._id !== postId),
+				);
+			} else {
+				refreshData();
+			}
+		},
+		[refreshData],
+	);
 
 	const profileDescription = useMemo(
 		() => `Posts by ${user?.name || "User"}`,
 		[user?.name],
 	);
 
+	if (userError) return <p>Error: {userError}</p>;
 	if (error) return <p>Error: {error}</p>;
 
 	return (
-		<div className="flex flex-col items-center">
+		<div className="flex w-full flex-col items-center">
 			{user && (
 				<Profile
 					name={user.name}
@@ -75,6 +77,7 @@ const UserProfile = () => {
 					data={posts}
 					isCurrentUserProfile={false}
 					isProfilePage={true}
+					onDelete={handleDelete}
 				/>
 			)}
 			{loading && <Spinner />}

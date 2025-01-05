@@ -32,10 +32,10 @@ const Profile: React.FC<ProfileProps> = ({
 	return (
 		<section className="w-full">
 			<h1 className="head_text text-left">
-				<span className="blue_gradient">{name}&#39;s</span> Profile
+				<span className="blue_gradient">{name}&apos;s</span> profile
 			</h1>
 			<p className="desc text-left">{desc}</p>
-			<div className="prompt_layout mt-10">{memoizedPromptCards}</div>
+			<div className="prompt_grid">{memoizedPromptCards}</div>
 		</section>
 	);
 };

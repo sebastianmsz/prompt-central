@@ -32,8 +32,8 @@ const Nav = () => {
 	}, []);
 
 	return (
-		<nav className="flex justify-between items-center w-full mb-16 pt-3">
-			<Link href="/" className="flex gap-2 flex-center">
+		<nav className="mb-8 flex w-full items-center justify-between pt-3 md:mb-16">
+			<Link href="/" className="flex-center flex gap-2">
 				<Image
 					src="/assets/img/logo.svg"
 					alt="Prompt Central Logo"
@@ -43,7 +43,7 @@ const Nav = () => {
 				<p className="logo_text">Prompt Central</p>
 			</Link>
 
-			<div className="sm:flex hidden">
+			<div className="hidden sm:flex">
 				{session?.user ? (
 					<div className="flex gap-3 md:gap-5">
 						<Link href="/create-prompt" className="black_btn">
@@ -89,7 +89,7 @@ const Nav = () => {
 				)}
 			</div>
 
-			<div className="sm:hidden flex relative">
+			<div className="relative flex sm:hidden">
 				{session?.user ? (
 					<div className="flex">
 						<Image
@@ -123,7 +123,7 @@ const Nav = () => {
 										setIsMenuOpen(false);
 										signOut({ callbackUrl: "/" });
 									}}
-									className="mt-5 w-full black_btn"
+									className="black_btn mt-2 w-full"
 								>
 									Sign Out
 								</button>

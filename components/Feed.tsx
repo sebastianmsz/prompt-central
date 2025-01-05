@@ -1,85 +1,50 @@
 "use client";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, ChangeEvent } from "react";
 import PromptCard from "./PromptCard";
 import { Post } from "@types";
-import React, { ChangeEvent } from "react";
+import React from "react";
 import Spinner from "./Spinner";
-
-const ITEMS_PER_PAGE = 10;
+import usePromptList from "@app/hooks/usePromptList";
 
 const Feed = () => {
-	const [prompts, setPrompts] = useState<Post[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-	const [page, setPage] = useState(1);
-	const [totalPages, setTotalPages] = useState(1);
-
-	const fetchPrompts = useCallback(async (pageNum: number) => {
-		try {
-			setLoading(true);
-			setError(null);
-
-			const response = await fetch(
-				`/api/prompt?page=${pageNum}&limit=${ITEMS_PER_PAGE}`,
-			);
-			if (!response.ok) throw new Error("Failed to fetch prompts");
-
-			const data = await response.json();
-			setPrompts((prev) =>
-				pageNum === 1 ? data.prompts : [...prev, ...data.prompts],
-			);
-			setTotalPages(data.pagination.totalPages);
-		} catch (err: unknown) {
-			let errorMessage = "An unknown error occurred";
-			if (err instanceof Error) {
-				errorMessage = err.message;
-			}
-			setError(errorMessage);
-		} finally {
-			setLoading(false);
-		}
-	}, []);
-
-	useEffect(() => {
-		fetchPrompts(page);
-	}, [fetchPrompts, page]);
-
-	const handleLoadMore = () => {
-		if (page < totalPages && !loading) {
-			setPage((prev) => prev + 1);
-		}
-	};
-
-	const handleTagClick = useCallback((tag: string) => {
-		console.log(`Tag clicked: ${tag}`);
-	}, []);
-
-	const handleDelete = useCallback((postId: string) => {
-		setPrompts((prevPrompts) =>
-			prevPrompts.filter((post) => post._id !== postId),
-		);
-	}, []);
-
-	const memoizedPromptCards = useMemo(
-		() =>
-			prompts.map((prompt) => (
-				<PromptCard
-					key={prompt._id}
-					post={prompt}
-					handleTagClick={handleTagClick}
-					userId={prompt.creator?.id}
-					isProfilePage={false}
-					isCurrentUserProfile={false}
-					onDelete={handleDelete}
-				/>
-			)),
-		[prompts, handleTagClick, handleDelete],
-	);
-
 	const [searchText, setSearchText] = useState("");
 	const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setSearchText(e.target.value);
 	};
+
+	const handleTagClick = useCallback((tag: string) => {
+		console.log(`Tag clicked: ${tag}`);
+		setSearchText(tag);
+	}, []);
+
+	const {
+		data: allPrompts,
+		loading,
+		error,
+		page,
+		totalPages,
+		handleLoadMore,
+		refreshData,
+	} = usePromptList<Post>({ apiEndpoint: "/api/prompt" });
+
+	const [prompts, setPrompts] = useState<Post[]>(allPrompts);
+
+	useEffect(() => {
+		setPrompts(allPrompts);
+	}, [allPrompts]);
+
+	const handleDelete = useCallback(
+		(postId: string, optimistic?: boolean) => {
+			if (optimistic) {
+				setPrompts((prevPrompts) =>
+					prevPrompts.filter((post) => post._id !== postId),
+				);
+			} else {
+				refreshData();
+			}
+		},
+		[refreshData],
+	);
 
 	useEffect(() => {
 		const delayDebounceFn = setTimeout(() => {
@@ -88,6 +53,32 @@ const Feed = () => {
 
 		return () => clearTimeout(delayDebounceFn);
 	}, [searchText]);
+
+	const filteredPrompts = useMemo(() => {
+		if (!searchText) return prompts;
+		const lowerSearchText = searchText.toLowerCase();
+		return prompts.filter(
+			(prompt) =>
+				prompt.prompt.toLowerCase().includes(lowerSearchText) ||
+				prompt.tag.toLowerCase().includes(lowerSearchText) ||
+				prompt.creator?.name?.toLowerCase().includes(lowerSearchText),
+		);
+	}, [prompts, searchText]);
+
+	const memoizedFilteredPromptCards = useMemo(
+		() =>
+			filteredPrompts.map((prompt) => (
+				<PromptCard
+					key={prompt._id}
+					post={prompt}
+					handleTagClick={handleTagClick}
+					userId={prompt.creator?.id}
+					isProfilePage={false}
+					onDelete={handleDelete}
+				/>
+			)),
+		[filteredPrompts, handleTagClick, handleDelete],
+	);
 
 	return (
 		<div className="flex w-full flex-col items-center">
@@ -101,9 +92,7 @@ const Feed = () => {
 					className="mt-5 w-full max-w-md rounded-md border px-5 py-2 text-sm shadow focus:border-black focus:outline-none focus:ring-0"
 				/>
 			</form>
-			<div className="mb-4 mt-10 grid w-full max-w-6xl auto-rows-min grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-				{memoizedPromptCards}
-			</div>
+			<div className="prompt_grid">{memoizedFilteredPromptCards}</div>
 			{loading && <Spinner />}
 			{page < totalPages && !loading && (
 				<button onClick={handleLoadMore} className="black_btn mb-4">

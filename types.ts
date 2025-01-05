@@ -8,13 +8,13 @@ declare module "next-auth" {
 	interface User {
 		_id: string;
 		name: string;
-        image:string;
+		image: string;
 		email: string;
 	}
 	interface Profile {
 		picture?: string;
-		name?: string
-		email?:string
+		name?: string;
+		email?: string;
 	}
 }
 
@@ -34,9 +34,9 @@ export interface FeedProps {
 export interface PromptCardProps {
 	post: Post;
 	handleTagClick: (tag: string) => void;
-	isCurrentUserProfile: boolean;
+	isCurrentUserProfile?: boolean;
 	isProfilePage: boolean;
-	onDelete?: (postId: string) => void;
+	onDelete?: (postId: string, optimistic?: boolean) => void;
 	userId?: string;
 }
 
@@ -77,7 +77,6 @@ export interface ProfileProps {
 export interface UserParams {
 	id: string;
 }
-
 
 export interface ErrorBoundaryProps {
 	children: ReactNode;
