@@ -6,7 +6,6 @@ export async function GET(request: NextRequest) {
 	try {
 		await connectToDb();
 
-		// Get pagination parameters from URL with defaults
 		const DEFAULT_PAGE = 1;
 		const DEFAULT_LIMIT = 12;
 		const searchParams = request.nextUrl.searchParams;
@@ -20,14 +19,12 @@ export async function GET(request: NextRequest) {
 		);
 		const skip = (page - 1) * limit;
 
-		// Get total count and prompts with optional filtering
 		const total = await Prompt.countDocuments({});
 		const prompts = await Prompt.find({})
 			.populate("creator")
 			.skip(skip)
 			.limit(limit);
 
-		// Return paginated results with metadata
 		return NextResponse.json(
 			{
 				prompts,

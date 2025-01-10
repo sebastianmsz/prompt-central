@@ -5,17 +5,13 @@ import { Post } from "@types";
 import React from "react";
 import Spinner from "./Spinner";
 import usePromptList from "@app/hooks/usePromptList";
+import { useSearchParams } from "next/navigation";
 
 const Feed = () => {
-	const [searchText, setSearchText] = useState("");
-	const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setSearchText(e.target.value);
-	};
+	const searchParams = useSearchParams();
+	const tag = searchParams.get("tag");
 
-	const handleTagClick = useCallback((tag: string) => {
-		console.log(`Tag clicked: ${tag}`);
-		setSearchText(tag);
-	}, []);
+	const [searchText, setSearchText] = useState("");
 
 	const {
 		data: allPrompts,
@@ -27,16 +23,15 @@ const Feed = () => {
 		refreshData,
 	} = usePromptList<Post>({ apiEndpoint: "/api/prompt" });
 
-	const [prompts, setPrompts] = useState<Post[]>(allPrompts);
-
-	useEffect(() => {
-		setPrompts(allPrompts);
-	}, [allPrompts]);
+	const handleTagClick = useCallback((tag: string) => {
+		console.log(`Tag clicked: ${tag}`);
+		setSearchText(tag);
+	}, []);
 
 	const handleDelete = useCallback(
 		(postId: string, optimistic?: boolean) => {
 			if (optimistic) {
-				setPrompts((prevPrompts) =>
+				setFilteredPrompts((prevPrompts) =>
 					prevPrompts.filter((post) => post._id !== postId),
 				);
 			} else {
@@ -46,24 +41,26 @@ const Feed = () => {
 		[refreshData],
 	);
 
+	const [filteredPrompts, setFilteredPrompts] = useState<Post[]>(allPrompts);
+
 	useEffect(() => {
 		const delayDebounceFn = setTimeout(() => {
-			console.log(searchText);
+			const lowerSearchText = searchText.toLowerCase();
+			const newFilteredPrompts = allPrompts.filter(
+				(prompt) =>
+					prompt.prompt.toLowerCase().includes(lowerSearchText) ||
+					prompt.tag.toLowerCase().includes(lowerSearchText) ||
+					prompt.creator?.name?.toLowerCase().includes(lowerSearchText),
+			);
+			setFilteredPrompts(newFilteredPrompts);
 		}, 300);
 
 		return () => clearTimeout(delayDebounceFn);
-	}, [searchText]);
+	}, [searchText, allPrompts]);
 
-	const filteredPrompts = useMemo(() => {
-		if (!searchText) return prompts;
-		const lowerSearchText = searchText.toLowerCase();
-		return prompts.filter(
-			(prompt) =>
-				prompt.prompt.toLowerCase().includes(lowerSearchText) ||
-				prompt.tag.toLowerCase().includes(lowerSearchText) ||
-				prompt.creator?.name?.toLowerCase().includes(lowerSearchText),
-		);
-	}, [prompts, searchText]);
+	useEffect(() => {
+		setFilteredPrompts(allPrompts);
+	}, [allPrompts]);
 
 	const memoizedFilteredPromptCards = useMemo(
 		() =>
@@ -80,6 +77,16 @@ const Feed = () => {
 		[filteredPrompts, handleTagClick, handleDelete],
 	);
 
+	const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setSearchText(e.target.value);
+	};
+
+	useEffect(() => {
+		if (tag) {
+			setSearchText(tag);
+		}
+	}, [tag]);
+
 	return (
 		<div className="flex w-full flex-col items-center">
 			<form className="relative flex w-full justify-center">
@@ -94,12 +101,12 @@ const Feed = () => {
 			</form>
 			<div className="prompt_grid">{memoizedFilteredPromptCards}</div>
 			{loading && <Spinner />}
-			{page < totalPages && !loading && (
+			{error && <div className="mt-4 text-red-500">{error}</div>}
+			{page < totalPages && !loading && !error && (
 				<button onClick={handleLoadMore} className="black_btn mb-4">
 					Load More
 				</button>
 			)}
-			{error && <div className="mt-4 text-red-500">{error}</div>}
 		</div>
 	);
 };

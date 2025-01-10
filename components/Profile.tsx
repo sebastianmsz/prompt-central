@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from "react";
 import PromptCard from "./PromptCard";
 import { ProfileProps } from "@types";
+import { useRouter } from "next/navigation";
 
 const Profile: React.FC<ProfileProps> = ({
 	name,
@@ -10,9 +11,15 @@ const Profile: React.FC<ProfileProps> = ({
 	isProfilePage,
 	onDelete,
 }) => {
-	const handleTagClick = useCallback((tag: string) => {
-		console.log(`Tag clicked: ${tag}`);
-	}, []);
+	const router = useRouter();
+
+	const handleTagClick = useCallback(
+		(tag: string) => {
+			console.log(`Tag clicked: ${tag}`);
+			router.push(`/?tag=${encodeURIComponent(tag)}`);
+		},
+		[router],
+	);
 
 	const memoizedPromptCards = useMemo(
 		() =>
@@ -26,7 +33,7 @@ const Profile: React.FC<ProfileProps> = ({
 					onDelete={onDelete}
 				/>
 			)),
-		[data, handleTagClick, isCurrentUserProfile, isProfilePage, onDelete],
+		[data, isCurrentUserProfile, isProfilePage],
 	);
 
 	return (

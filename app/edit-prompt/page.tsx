@@ -27,8 +27,7 @@ const EditPrompt = () => {
 		prompt: "",
 		tag: "",
 	});
-    const [error, setError] = useState<string | null>(null);
-
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (status !== "loading" && status !== "authenticated") {
@@ -36,50 +35,60 @@ const EditPrompt = () => {
 		}
 	}, [session, status, router]);
 
+	const fetchPromptData = useCallback(async () => {
+		if (promptId) {
+			const controller = new AbortController();
+			const signal = controller.signal;
 
-    const fetchPromptData = useCallback(async () => {
-        if (promptId) {
-            try {
-              const response = await fetch(`/api/prompt/${promptId}?id=${promptId}`);
-                if (!response.ok) {
-                    const message = `An error has occurred: ${response.status}`;
-                    throw new Error(message);
-                }
-                const data: Post = await response.json();
-                setPost(data)
-            } catch (err: unknown) {
-                let errorMessage = "An unknown error occurred";
-				if (err instanceof Error) {
-					errorMessage = err.message;
+			setLoading(true);
+			try {
+				const response = await fetch(`/api/prompt/${promptId}`, { signal });
+				if (!response.ok) {
+					const message = `An error has occurred: ${response.status}`;
+					throw new Error(message);
 				}
-                console.error("Error fetching user data:", err);
-                setError(errorMessage);
-            } finally {
-                setLoading(false);
-            }
-        }else{
-          setLoading(false)
-        }
-    }, [promptId]);
+				const data: Post = await response.json();
+				setPost({
+					prompt: data.prompt,
+					tag: data.tag,
+				});
+			} catch (err: unknown) {
+				if (err instanceof Error && err.name === "AbortError") {
+					console.log("Fetch aborted");
+				} else {
+					let errorMessage = "An unknown error occurred";
+					if (err instanceof Error) {
+						errorMessage = err.message;
+					}
+					console.error("Error fetching user data:", err);
+					setError(errorMessage);
+				}
+			} finally {
+				setLoading(false);
+			}
 
-
+			return () => {
+				controller.abort();
+			};
+		} else {
+			setLoading(false);
+		}
+	}, [promptId]);
 
 	useEffect(() => {
-        fetchPromptData()
-	}, [fetchPromptData]);
+		fetchPromptData();
+	}, [promptId]);
 
-
-
-    const updatePrompt = async (e: FormEvent) => {
+	const updatePrompt = async (e: FormEvent) => {
 		e.preventDefault();
 		setSubmitting(true);
-        setError(null)
+		setError(null);
 		try {
-            if(!promptId){
-                setError("Missing prompt id");
-                return;
-            }
-			const response = await fetch(`/api/prompt/${promptId}?id=${promptId}`, {
+			if (!promptId) {
+				setError("Missing prompt id");
+				return;
+			}
+			const response = await fetch(`/api/prompt/${promptId}`, {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
@@ -109,17 +118,16 @@ const EditPrompt = () => {
 		}
 	};
 
-
-	if(loading){
-		return <Spinner/>
+	if (loading) {
+		return <Spinner />;
 	}
-    if (error) {
+	if (error) {
 		return <p>Error: {error}</p>;
 	}
 
 	return (
 		<>
-            {error && <div className="text-red-500">{error}</div>}
+			{error && <div className="text-red-500">{error}</div>}
 			<Form
 				type="Edit"
 				post={post as Post}
@@ -132,11 +140,11 @@ const EditPrompt = () => {
 };
 
 const EditPromptPage = () => {
-    return (
-        <Suspense fallback={<Spinner/>}>
-            <EditPrompt/>
-        </Suspense>
-    )
-}
+	return (
+		<Suspense fallback={<Spinner />}>
+			<EditPrompt />
+		</Suspense>
+	);
+};
 
-export default EditPromptPage
+export default EditPromptPage;

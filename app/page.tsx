@@ -1,5 +1,6 @@
-import React from "react";
+import React, { Suspense } from "react";
 import Feed from "@components/Feed";
+import Spinner from "@components/Spinner";
 
 const Home: React.FC = () => {
 	return (
@@ -13,7 +14,9 @@ const Home: React.FC = () => {
 				Prompt Central is an open-source AI prompting tool for modern world to
 				discover, create and share creative prompts
 			</p>
-			<Feed />
+			<Suspense fallback={<Spinner />}>
+				<Feed />
+			</Suspense>
 		</section>
 	);
 };

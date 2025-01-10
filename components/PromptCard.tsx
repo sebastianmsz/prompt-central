@@ -4,7 +4,7 @@ import Image from "next/image";
 import { PromptCardProps as Props } from "@types";
 import Modal from "./Modal";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
 
@@ -40,7 +40,7 @@ const PromptCard: React.FC<Props> = ({
 		try {
 			if (post._id && onDelete) {
 				onDelete(post._id, true);
-				const response = await fetch(`/api/prompt/${post._id}?id=${post._id}`, {
+				const response = await fetch(`/api/prompt/${post._id}`, {
 					method: "DELETE",
 				});
 				if (!response.ok) {
@@ -60,12 +60,13 @@ const PromptCard: React.FC<Props> = ({
 		}
 	};
 
-	const handleEdit = useCallback(
-		(postId: string) => {
-			router.push(`/edit-prompt?id=${postId}`);
-		},
-		[router],
-	);
+	const handleEdit = useCallback(() => {
+		if (session?.user && post._id) {
+			router.push(`/edit-prompt?id=${post._id}`);
+		} else {
+			signIn("google");
+		}
+	}, [router, session, post]);
 
 	const handleCloseModal = () => {
 		setIsModalOpen(false);
@@ -145,7 +146,7 @@ const PromptCard: React.FC<Props> = ({
 			{isProfilePage && isCurrentUserPost && (
 				<div className="flex justify-end gap-2">
 					<button
-						onClick={() => handleEdit(post._id || "")}
+						onClick={handleEdit}
 						className="rounded-md bg-blue-500 px-3 py-1 text-white"
 					>
 						Edit

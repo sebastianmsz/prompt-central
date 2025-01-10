@@ -1,12 +1,9 @@
-import mongoose from "mongoose";
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-	serverExternalPackages: ["mongoose"],
-	eslint:{
-    ignoreDuringBuilds: true,
-  },
-  images: {
+const nextConfig = {
+	serverExternalPackages: ["pino", "mongoose"],
+	eslint: {
+		ignoreDuringBuilds: true,
+	},
+	images: {
 		remotePatterns: [
 			{
 				protocol: "https",
@@ -14,7 +11,6 @@ const nextConfig: NextConfig = {
 			},
 		],
 	},
-
 };
 
-export default nextConfig;
+module.exports = nextConfig;
