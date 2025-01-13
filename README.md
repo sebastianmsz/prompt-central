@@ -1,10 +1,10 @@
 # Prompt Central 🧠
 
-**Discover and Share AI-Powered Prompts**
+## Discover and Share AI-Powered Prompts
 
 Prompt Central is an open-source platform that allows users to explore, create, and share creative prompts for AI models. Whether you're an AI enthusiast, developer, or just curious, Prompt Central is the place to find inspiration and contribute your own ideas.
 
-![Prompt Central](screenshot.png)
+![Prompt Central](screenshot.jpeg)
 
 ## Features
 
@@ -121,7 +121,3 @@ Contributions are welcome! Please follow these steps:
 ## License
 
 This project is licensed under the MIT License.
-
----
-
-Feel free to customize this README file according to your project's specific needs.
