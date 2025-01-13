@@ -21,11 +21,9 @@ declare module "next-auth" {
 export interface Post {
 	_id?: string;
 	prompt: string;
-	tag: string;
+	tag: string[];
 	creator?: User | null;
 }
-
-export type CreatePost = Partial<Post>;
 
 export interface FeedProps {
 	handleTagClick: (tag: string) => void;
@@ -84,4 +82,10 @@ export interface ErrorBoundaryProps {
 
 export interface ErrorBoundaryState {
 	hasError: boolean;
+}
+
+export interface CreatePost {
+	prompt: string;
+	tag: string[]; // Make sure tag is an array of strings
+	creator?: User | null;
 }

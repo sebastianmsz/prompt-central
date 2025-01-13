@@ -5,7 +5,7 @@ import { PromptCardProps as Props } from "@types";
 import { useSession, signIn } from "next-auth/react";
 import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
-import Link from "@node_modules/next/link";
+import Link from "next/link";
 
 const PromptCard: React.FC<Props> = ({
 	post,
@@ -24,6 +24,10 @@ const PromptCard: React.FC<Props> = ({
 
 	const isCurrentUserPost = session?.user?.id === post.creator?._id;
 
+	const maxTagsToDisplay = 3;
+	const tagsToDisplay = post.tag.slice(0, maxTagsToDisplay);
+	const hasMoreTags = post.tag.length > maxTagsToDisplay;
+
 	const handleCopy = () => {
 		setCopied(post.prompt);
 		navigator.clipboard.writeText(post.prompt);
@@ -32,7 +36,8 @@ const PromptCard: React.FC<Props> = ({
 		}, 2000);
 	};
 
-	const handleDeleteClick = async () => {
+	const handleDeleteClick = (event: React.MouseEvent) => {
+		event.stopPropagation(); // Prevent triggering the modal when delete is clicked
 		setIsDeleteModalOpen(true);
 	};
 
@@ -74,7 +79,8 @@ const PromptCard: React.FC<Props> = ({
 		setIsDeleteModalOpen(false);
 	};
 
-	const handleMaximize = () => {
+	const handleMaximize = (event: React.MouseEvent) => {
+		event.stopPropagation();
 		setIsMaximized(true);
 	};
 
@@ -98,6 +104,13 @@ const PromptCard: React.FC<Props> = ({
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
 	}, [isMaximized, handleClickOutside]);
+
+	const handleTagClickWrapper = (tag: string, isModal: boolean) => {
+		handleTagClick?.(tag);
+		if (isModal) {
+			handleCloseMaximize();
+		}
+	};
 
 	const renderUserInfo = () => (
 		<Link
@@ -137,10 +150,7 @@ const PromptCard: React.FC<Props> = ({
 					Edit
 				</button>
 				<button
-					onClick={(event) => {
-						event.stopPropagation();
-						handleDeleteClick();
-					}}
+					onClick={handleDeleteClick}
 					disabled={deleting}
 					className="rounded-md bg-red-500 px-3 py-1 text-white"
 				>
@@ -148,6 +158,20 @@ const PromptCard: React.FC<Props> = ({
 				</button>
 			</div>
 		);
+
+	const renderTags = (isModal: boolean) =>
+		(isModal ? post.tag : tagsToDisplay).map((tag, index) => (
+			<p
+				key={index}
+				className="blue_gradient cursor-pointer truncate font-inter text-sm decoration-blue-500 hover:underline"
+				onClick={(event) => {
+					event.stopPropagation();
+					handleTagClickWrapper(tag, isModal);
+				}}
+			>
+				#{tag}
+			</p>
+		));
 
 	const renderContent = (isModal = false) => (
 		<>
@@ -209,16 +233,14 @@ const PromptCard: React.FC<Props> = ({
 			>
 				{post.prompt}
 			</p>
-			<p
-				className="blue_gradient cursor-pointer truncate font-inter text-sm"
-				onClick={(event) => {
-					event.stopPropagation();
-					handleTagClick?.(post.tag);
-					if (isModal) handleCloseMaximize();
-				}}
-			>
-				{post.tag}
-			</p>
+			<div className="mt-2 flex flex-wrap items-center gap-1">
+				{renderTags(isModal)}
+				{hasMoreTags && !isModal && (
+					<span className="font-inter text-sm text-gray-500">
+						...and {post.tag.length - maxTagsToDisplay} more
+					</span>
+				)}
+			</div>
 			{renderButtons()}
 		</>
 	);
@@ -255,7 +277,7 @@ const PromptCard: React.FC<Props> = ({
 			<div
 				className="flex cursor-pointer flex-col gap-4 overflow-hidden rounded-lg bg-white p-4 shadow-md"
 				onClick={handleMaximize}
-				ref={backdropRef}
+				ref={modalRef}
 			>
 				{renderContent()}
 			</div>

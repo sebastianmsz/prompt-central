@@ -1,3 +1,4 @@
+// /app/api/prompt/new/route.ts
 import { connectToDb } from "@utils/database";
 import Prompt from "@models/prompt";
 import { NextResponse } from "next/server";
@@ -5,20 +6,33 @@ import { CreatePost } from "@types";
 
 export async function POST(request: Request) {
 	try {
-		const { userId, prompt, tag } = (await request.json()) as CreatePost & {
+		const reqBody = (await request.json()) as CreatePost & {
 			userId: string;
 		};
 
-		if (!userId || !prompt || !tag) {
+		// Validate the tag field
+		if (
+			!reqBody.userId ||
+			!reqBody.prompt ||
+			!reqBody.tag ||
+			!Array.isArray(reqBody.tag) ||
+			reqBody.tag.length === 0
+		) {
 			return NextResponse.json(
 				{
-					message: "Please provide a userId, prompt and tag",
+					message:
+						"Please provide a userId, prompt, and at least one tag (as an array)",
 				},
 				{ status: 400 },
 			);
 		}
+
 		await connectToDb();
-		const newPrompt = new Prompt({ creator: userId, prompt, tag });
+		const newPrompt = new Prompt({
+			creator: reqBody.userId,
+			prompt: reqBody.prompt,
+			tag: reqBody.tag,
+		});
 		await newPrompt.save();
 
 		return NextResponse.json(newPrompt, { status: 201 });
@@ -33,7 +47,7 @@ export async function POST(request: Request) {
 		return NextResponse.json(
 			{
 				message: "Failed to create new prompt",
-				error: errorMessage,
+				error: errorMessage, // Send the actual error message in the response
 			},
 			{ status: 500 },
 		);

@@ -49,7 +49,9 @@ const Feed = () => {
 			const newFilteredPrompts = allPrompts.filter(
 				(prompt) =>
 					prompt.prompt.toLowerCase().includes(lowerSearchText) ||
-					prompt.tag.toLowerCase().includes(lowerSearchText) ||
+					prompt.tag.some((tag) =>
+						tag.toLowerCase().includes(lowerSearchText),
+					) ||
 					prompt.creator?.name?.toLowerCase().includes(lowerSearchText),
 			);
 			setFilteredPrompts(newFilteredPrompts);

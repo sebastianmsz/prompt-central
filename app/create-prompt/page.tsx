@@ -26,7 +26,7 @@ const CreatePrompt = () => {
 	const [submitting, setSubmitting] = useState<boolean>(false);
 	const [post, setPost] = useState<Partial<Post>>({
 		prompt: "",
-		tag: "",
+		tag: [],
 	});
 	const [error, setError] = useState<string | null>(null);
 
@@ -35,10 +35,10 @@ const CreatePrompt = () => {
 		setSubmitting(true);
 		setError(null);
 		try {
-            if(!session?.user?.id){
-                setError("User not logged in");
-                return
-            }
+			if (!session?.user?.id) {
+				setError("User not logged in");
+				return;
+			}
 			const response = await fetch("/api/prompt/new", {
 				method: "POST",
 				headers: {

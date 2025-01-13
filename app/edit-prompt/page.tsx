@@ -25,7 +25,7 @@ const EditPrompt = () => {
 	const [submitting, setSubmitting] = useState<boolean>(false);
 	const [post, setPost] = useState<Partial<Post>>({
 		prompt: "",
-		tag: "",
+		tag: [],
 	});
 	const [error, setError] = useState<string | null>(null);
 
