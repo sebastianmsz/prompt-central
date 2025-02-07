@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 import {
 	signIn,
 	signOut,
@@ -43,7 +44,8 @@ const Nav = () => {
 				<p className="logo_text">Prompt Central</p>
 			</Link>
 
-			<div className="hidden sm:flex">
+			<div className="hidden gap-3 sm:flex">
+				<ThemeToggle />
 				{session?.user ? (
 					<div className="flex gap-3 md:gap-5">
 						<Link href="/create-prompt" className="black_btn">
@@ -102,7 +104,7 @@ const Nav = () => {
 						/>
 
 						{isMenuOpen && (
-							<div className="dropdown">
+							<div className="dropdown absolute right-0 top-full mt-3">
 								<Link
 									href={`/profile/${session.user.id}`}
 									className="dropdown_link"
@@ -117,6 +119,7 @@ const Nav = () => {
 								>
 									Create Prompt
 								</Link>
+								<ThemeToggle />
 								<button
 									type="button"
 									onClick={() => {
@@ -131,7 +134,8 @@ const Nav = () => {
 						)}
 					</div>
 				) : (
-					<>
+					<div className="flex items-center gap-3">
+						<ThemeToggle />
 						{providers &&
 							Object.values(providers).map((provider) => (
 								<button
@@ -143,7 +147,7 @@ const Nav = () => {
 									Sign in with {provider.name}
 								</button>
 							))}
-					</>
+					</div>
 				)}
 			</div>
 		</nav>

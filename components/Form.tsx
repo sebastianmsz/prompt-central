@@ -1,4 +1,3 @@
-// /components/Form.tsx
 import React from "react";
 import Link from "next/link";
 import { FormProps } from "@types";

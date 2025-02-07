@@ -2,19 +2,27 @@ import React, { Suspense } from "react";
 import Feed from "@components/Feed";
 import Spinner from "@components/Spinner";
 
-const Home: React.FC = () => {
+const HeroSection = () => (
+	<div className="mx-auto max-w-7xl space-y-6 py-12 text-center">
+		<h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
+			Master AI Prompting with{" "}
+			<span className="red_gradient mt-2 block">Prompt Central</span>
+		</h1>
+		<p className="mx-auto max-w-2xl text-xl text-gray-600">
+			Your collaborative hub for sharing powerful AI prompts that deliver
+			results
+		</p>
+	</div>
+);
+
+const Home = () => {
 	return (
-		<section className="flex-center w-full flex-col">
-			<h1 className="head_text text center">
-				Discover and Share
-				<br className="max-md:hidden" />
-				<span className="orange_gradient text-center">AI-Powered Prompts</span>
-			</h1>
-			<p className="desc text-center">Your Hub for AI-Powered Creativity</p>
+		<main className="flex min-h-screen flex-col items-center px-4 sm:px-8">
+			<HeroSection />
 			<Suspense fallback={<Spinner />}>
 				<Feed />
 			</Suspense>
-		</section>
+		</main>
 	);
 };
 

@@ -86,9 +86,6 @@ export async function GET(
 	}
 }
 
-// /app/api/prompt/[id]/route.ts
-// ... (other imports)
-
 export async function PATCH(
 	request: NextRequest,
 	{ params }: { params: Promise<Params> },
@@ -107,7 +104,7 @@ export async function PATCH(
 		const { prompt, tag } = (await request.json()) as {
 			prompt: string;
 			tag: string[];
-		}; // Expect tag to be an array
+		};
 
 		if (!Array.isArray(tag)) {
 			return NextResponse.json(
@@ -144,4 +141,3 @@ export async function PATCH(
 		);
 	}
 }
-// ... (rest of the file)

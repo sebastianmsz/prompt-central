@@ -115,21 +115,21 @@ const PromptCard: React.FC<Props> = ({
 	const renderUserInfo = () => (
 		<Link
 			href={`/profile/${post.creator?._id}`}
-			className="flex w-full max-w-[70%] cursor-pointer items-center gap-3"
+			className="flex w-full items-center gap-2 sm:max-w-[70%] sm:gap-3"
 			onClick={(event) => event.stopPropagation()}
 		>
 			<Image
 				src={post.creator?.image || "/assets/img/default-user.svg"}
 				alt="user_image"
-				width={40}
-				height={40}
-				className="rounded-full object-contain"
+				width={32}
+				height={32}
+				className="rounded-full object-contain ring-2 ring-gray-200 sm:h-10 sm:w-10 dark:ring-gray-700"
 			/>
 			<div className="min-w-0 flex-1">
-				<h3 className="truncate font-satoshi font-semibold text-gray-900">
+				<h3 className="truncate font-satoshi text-sm font-semibold text-gray-900 sm:text-base dark:text-white">
 					{post.creator?.name}
 				</h3>
-				<p className="truncate font-inter text-sm text-gray-500">
+				<p className="truncate text-xs text-gray-500 sm:text-sm dark:text-gray-400">
 					{post.creator?.email}
 				</p>
 			</div>
@@ -139,20 +139,20 @@ const PromptCard: React.FC<Props> = ({
 	const renderButtons = () =>
 		isProfilePage &&
 		isCurrentUserPost && (
-			<div className="mt-4 flex justify-end gap-2">
+			<div className="mt-3 flex justify-end gap-2 sm:mt-4">
 				<button
 					onClick={(event) => {
 						event.stopPropagation();
 						handleEdit();
 					}}
-					className="rounded-md bg-blue-500 px-3 py-1 text-white"
+					className="rounded-md bg-blue-500 px-2 py-1 text-xs text-white sm:px-3 sm:text-sm"
 				>
 					Edit
 				</button>
 				<button
 					onClick={handleDeleteClick}
 					disabled={deleting}
-					className="rounded-md bg-red-500 px-3 py-1 text-white"
+					className="rounded-md bg-red-500 px-2 py-1 text-xs text-white sm:px-3 sm:text-sm"
 				>
 					{deleting ? "Deleting..." : "Delete"}
 				</button>
@@ -174,36 +174,39 @@ const PromptCard: React.FC<Props> = ({
 		));
 
 	const renderContent = (isModal = false) => (
-		<>
-			<div className="flex flex-wrap items-start justify-between gap-5">
+		<div className="flex h-full flex-col">
+			<div className="flex items-start justify-between gap-4">
 				{renderUserInfo()}
 				<div className="flex items-center gap-2">
-					<div
+					<button
 						onClick={(event) => {
 							event.stopPropagation();
 							handleCopy();
 						}}
-						className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-white/10 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur"
+						className="group relative flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
 					>
 						<Image
 							src={copied ? "/assets/icons/tick.svg" : "/assets/icons/copy.svg"}
 							alt="Copy icon"
-							width={20}
-							height={20}
+							width={18}
+							height={18}
 						/>
-					</div>
+						<span className="absolute -bottom-8 hidden whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white group-hover:block dark:bg-gray-700">
+							{copied ? "Copied!" : "Copy prompt"}
+						</span>
+					</button>
 					{isModal && (
 						<button
 							onClick={handleCloseMaximize}
-							className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300"
+							className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								fill="none"
 								viewBox="0 0 24 24"
-								strokeWidth={1.5}
+								strokeWidth={2}
 								stroke="currentColor"
-								className="h-6 w-6"
+								className="h-5 w-5"
 							>
 								<path
 									strokeLinecap="round"
@@ -215,51 +218,48 @@ const PromptCard: React.FC<Props> = ({
 					)}
 				</div>
 			</div>
-			<p
-				className={`my-4 break-words font-satoshi text-sm text-gray-700 ${
-					isModal
-						? "max-h-[40vh] overflow-auto"
-						: "max-h-10 overflow-hidden text-ellipsis"
-				}`}
-				style={
-					isModal
-						? {}
-						: {
-								WebkitLineClamp: 2,
-								display: "-webkit-box",
-								WebkitBoxOrient: "vertical",
-							}
-				}
-			>
-				{post.prompt}
-			</p>
-			<div className="mt-2 flex flex-wrap items-center gap-1">
-				{renderTags(isModal)}
-				{hasMoreTags && !isModal && (
-					<span className="font-inter text-sm text-gray-500">
-						...and {post.tag.length - maxTagsToDisplay} more
-					</span>
-				)}
+
+			<div className="mt-4 flex-grow">
+				<p
+					className={`font-satoshi text-sm text-gray-700 dark:text-gray-300 ${
+						isModal
+							? "max-h-[40vh] overflow-auto"
+							: "line-clamp-2 cursor-pointer"
+					}`}
+				>
+					{post.prompt}
+				</p>
 			</div>
-			{renderButtons()}
-		</>
+
+			<div className="mt-4 space-y-4">
+				<div className="flex flex-wrap items-center gap-2">
+					{renderTags(isModal)}
+					{hasMoreTags && !isModal && (
+						<span className="text-xs text-gray-500">
+							+{post.tag.length - maxTagsToDisplay}
+						</span>
+					)}
+				</div>
+				{renderButtons()}
+			</div>
+		</div>
 	);
 
 	return (
 		<>
 			{isDeleteModalOpen && (
 				<div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black bg-opacity-50 p-4">
-					<div className="w-full max-w-[95%] rounded-md bg-white p-4 shadow-lg sm:w-96 sm:max-w-none sm:p-6">
-						<h2 className="mb-3 text-lg font-bold sm:mb-4 sm:text-xl">
+					<div className="dark:bg-dark-surface w-full max-w-[95%] rounded-md bg-white p-4 shadow-lg sm:w-96 sm:max-w-none sm:p-6">
+						<h2 className="mb-3 text-lg font-bold sm:mb-4 sm:text-xl dark:text-white">
 							Confirm Delete
 						</h2>
-						<p className="mb-4 text-sm sm:mb-6 sm:text-base">
+						<p className="mb-4 text-sm sm:mb-6 sm:text-base dark:text-gray-300">
 							Are you sure you want to delete this post?
 						</p>
 						<div className="flex justify-end gap-2 sm:gap-4">
 							<button
 								onClick={handleCloseDeleteModal}
-								className="rounded-md bg-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-300 sm:px-4 sm:py-2 sm:text-base"
+								className="rounded-md bg-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-300 sm:px-4 sm:py-2 sm:text-base dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
 							>
 								Cancel
 							</button>
@@ -275,7 +275,7 @@ const PromptCard: React.FC<Props> = ({
 			)}
 
 			<div
-				className="flex cursor-pointer flex-col gap-4 overflow-hidden rounded-lg bg-white p-4 shadow-md"
+				className="dark:bg-dark-surface group flex cursor-pointer flex-col overflow-hidden rounded-xl bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-5 dark:shadow-gray-800/10"
 				onClick={handleMaximize}
 				ref={modalRef}
 			>
@@ -284,14 +284,14 @@ const PromptCard: React.FC<Props> = ({
 
 			{isMaximized && (
 				<div
-					className="fixed left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-black bg-opacity-50 p-4"
+					className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-2 backdrop-blur-sm sm:p-4"
 					ref={backdropRef}
 				>
 					<div
-						className="relative max-h-[95%] w-full max-w-[95%] overflow-auto rounded-lg bg-white shadow-lg sm:w-auto sm:max-w-[80%]"
+						className="dark:bg-dark-surface relative max-h-[95vh] w-full max-w-[95%] overflow-auto rounded-xl bg-white p-4 shadow-xl sm:max-h-[90vh] sm:max-w-2xl sm:p-6"
 						ref={modalRef}
 					>
-						<div className="p-4 sm:p-6">{renderContent(true)}</div>
+						{renderContent(true)}
 					</div>
 				</div>
 			)}

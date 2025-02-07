@@ -1,4 +1,3 @@
-// /app/api/prompt/new/route.ts
 import { connectToDb } from "@utils/database";
 import Prompt from "@models/prompt";
 import { NextResponse } from "next/server";
@@ -10,7 +9,6 @@ export async function POST(request: Request) {
 			userId: string;
 		};
 
-		// Validate the tag field
 		if (
 			!reqBody.userId ||
 			!reqBody.prompt ||
@@ -47,7 +45,7 @@ export async function POST(request: Request) {
 		return NextResponse.json(
 			{
 				message: "Failed to create new prompt",
-				error: errorMessage, // Send the actual error message in the response
+				error: errorMessage,
 			},
 			{ status: 500 },
 		);

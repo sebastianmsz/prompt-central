@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
+	darkMode: "class",
 	content: [
 		"./pages/**/*.{js,ts,jsx,tsx,mdx}",
 		"./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -14,6 +15,8 @@ export default {
 			},
 			colors: {
 				"primary-orange": "#FF5722",
+				"dark-bg": "#121212",
+				"dark-surface": "#1E1E1E",
 			},
 		},
 	},
