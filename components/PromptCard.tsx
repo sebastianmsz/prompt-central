@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import { PromptCardProps as Props } from "@types";
@@ -37,7 +38,7 @@ const PromptCard: React.FC<Props> = ({
 	};
 
 	const handleDeleteClick = (event: React.MouseEvent) => {
-		event.stopPropagation(); // Prevent triggering the modal when delete is clicked
+		event.stopPropagation();
 		setIsDeleteModalOpen(true);
 	};
 
@@ -105,12 +106,15 @@ const PromptCard: React.FC<Props> = ({
 		};
 	}, [isMaximized, handleClickOutside]);
 
-	const handleTagClickWrapper = (tag: string, isModal: boolean) => {
-		handleTagClick?.(tag);
-		if (isModal) {
-			handleCloseMaximize();
-		}
-	};
+	const onTagClick = useCallback(
+		(tag: string, isModal: boolean) => {
+			handleTagClick?.(tag);
+			if (isModal) {
+				handleCloseMaximize();
+			}
+		},
+		[handleTagClick],
+	);
 
 	const renderUserInfo = () => (
 		<Link
@@ -123,13 +127,13 @@ const PromptCard: React.FC<Props> = ({
 				alt="user_image"
 				width={32}
 				height={32}
-				className="rounded-full object-contain ring-2 ring-gray-200 sm:h-10 sm:w-10 dark:ring-gray-700"
+				className="rounded-full object-contain ring-2 ring-gray-200 dark:ring-gray-700 sm:h-10 sm:w-10"
 			/>
 			<div className="min-w-0 flex-1">
-				<h3 className="truncate font-satoshi text-sm font-semibold text-gray-900 sm:text-base dark:text-white">
+				<h3 className="truncate font-satoshi text-sm font-semibold text-gray-900 dark:text-white sm:text-base">
 					{post.creator?.name}
 				</h3>
-				<p className="truncate text-xs text-gray-500 sm:text-sm dark:text-gray-400">
+				<p className="truncate text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
 					{post.creator?.email}
 				</p>
 			</div>
@@ -161,16 +165,16 @@ const PromptCard: React.FC<Props> = ({
 
 	const renderTags = (isModal: boolean) =>
 		(isModal ? post.tag : tagsToDisplay).map((tag, index) => (
-			<p
+			<button
 				key={index}
 				className="blue_gradient cursor-pointer truncate font-inter text-sm decoration-blue-500 hover:underline"
 				onClick={(event) => {
 					event.stopPropagation();
-					handleTagClickWrapper(tag, isModal);
+					onTagClick(tag, isModal);
 				}}
 			>
 				#{tag}
-			</p>
+			</button>
 		));
 
 	const renderContent = (isModal = false) => (
@@ -191,9 +195,6 @@ const PromptCard: React.FC<Props> = ({
 							width={18}
 							height={18}
 						/>
-						<span className="absolute -bottom-8 hidden whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white group-hover:block dark:bg-gray-700">
-							{copied ? "Copied!" : "Copy prompt"}
-						</span>
 					</button>
 					{isModal && (
 						<button
@@ -249,17 +250,17 @@ const PromptCard: React.FC<Props> = ({
 		<>
 			{isDeleteModalOpen && (
 				<div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black bg-opacity-50 p-4">
-					<div className="dark:bg-dark-surface w-full max-w-[95%] rounded-md bg-white p-4 shadow-lg sm:w-96 sm:max-w-none sm:p-6">
-						<h2 className="mb-3 text-lg font-bold sm:mb-4 sm:text-xl dark:text-white">
+					<div className="w-full max-w-[95%] rounded-md bg-white p-4 shadow-lg dark:bg-dark-surface sm:w-96 sm:max-w-none sm:p-6">
+						<h2 className="mb-3 text-lg font-bold dark:text-white sm:mb-4 sm:text-xl">
 							Confirm Delete
 						</h2>
-						<p className="mb-4 text-sm sm:mb-6 sm:text-base dark:text-gray-300">
+						<p className="mb-4 text-sm dark:text-gray-300 sm:mb-6 sm:text-base">
 							Are you sure you want to delete this post?
 						</p>
 						<div className="flex justify-end gap-2 sm:gap-4">
 							<button
 								onClick={handleCloseDeleteModal}
-								className="rounded-md bg-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-300 sm:px-4 sm:py-2 sm:text-base dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+								className="rounded-md bg-gray-200 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 sm:px-4 sm:py-2 sm:text-base"
 							>
 								Cancel
 							</button>
@@ -275,7 +276,7 @@ const PromptCard: React.FC<Props> = ({
 			)}
 
 			<div
-				className="dark:bg-dark-surface group flex cursor-pointer flex-col overflow-hidden rounded-xl bg-white p-3 shadow-sm transition-shadow hover:shadow-md sm:p-5 dark:shadow-gray-800/10"
+				className="group flex cursor-pointer flex-col overflow-hidden rounded-xl bg-white p-3 shadow-sm transition-shadow hover:shadow-md dark:bg-dark-surface dark:shadow-gray-800/10 sm:p-5"
 				onClick={handleMaximize}
 				ref={modalRef}
 			>
@@ -288,7 +289,7 @@ const PromptCard: React.FC<Props> = ({
 					ref={backdropRef}
 				>
 					<div
-						className="dark:bg-dark-surface relative max-h-[95vh] w-full max-w-[95%] overflow-auto rounded-xl bg-white p-4 shadow-xl sm:max-h-[90vh] sm:max-w-2xl sm:p-6"
+						className="relative max-h-[95vh] w-full max-w-[95%] overflow-auto rounded-xl bg-white p-4 shadow-xl dark:bg-dark-surface sm:max-h-[90vh] sm:max-w-2xl sm:p-6"
 						ref={modalRef}
 					>
 						{renderContent(true)}

@@ -74,7 +74,7 @@
 
 .black_btn {
 	@apply flex items-center justify-center rounded-full border border-black bg-black px-5 py-1.5 text-center font-inter text-sm text-white transition-all hover:bg-white hover:text-black;
-	@apply dark:hover:bg-dark-surface dark:border-white dark:bg-white dark:text-black dark:hover:text-white;
+	@apply dark:border-white dark:bg-white dark:text-black dark:hover:bg-dark-surface dark:hover:text-white;
 }
 
 .outline_btn {
@@ -106,7 +106,7 @@
 
 .glassmorphism {
 	@apply rounded-xl border border-gray-200 bg-white/20 p-5 shadow-[inset_10px_-50px_94px_0_rgb(199,199,199,0.2)] backdrop-blur;
-	@apply dark:bg-dark-surface/20 dark:border-gray-800 dark:shadow-[inset_10px_-50px_94px_0_rgb(30,30,30,0.2)];
+	@apply dark:border-gray-800 dark:bg-dark-surface/20 dark:shadow-[inset_10px_-50px_94px_0_rgb(30,30,30,0.2)];
 }
 
 .form_textarea {
@@ -136,7 +136,7 @@
 
 .prompt_card {
 	@apply h-fit w-full flex-1 break-inside-avoid rounded-lg border border-gray-300 bg-white/20 bg-clip-padding p-6 pb-4 backdrop-blur-lg backdrop-filter md:w-[360px];
-	@apply dark:bg-dark-surface/20 dark:border-gray-800;
+	@apply dark:border-gray-800 dark:bg-dark-surface/20;
 }
 
 .flex-center {
