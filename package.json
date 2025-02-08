@@ -10,6 +10,7 @@
 		"format": "prettier --check ."
 	},
 	"dependencies": {
+		"framer-motion": "^12.4.1",
 		"lucide-react": "^0.475.0",
 		"mongodb": "^6.11.0",
 		"mongoose": "^8.9.3",
