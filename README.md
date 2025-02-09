@@ -38,8 +38,8 @@ Follow these instructions to get a copy of the project up and running on your lo
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/your-username/prompt-central.git
-   cd prompt-central
+   git clone https://github.com/sebastianmsz/promptcentral.git
+   cd promptcentral
    ```
 
 2. **Install Dependencies**

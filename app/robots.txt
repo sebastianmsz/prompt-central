@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://promptcentral.vercel.app/sitemap.xml
+
+# Prevent crawling of authentication pages
+Disallow: /api/auth/*
+
+# Rate limiting
+Crawl-delay: 1

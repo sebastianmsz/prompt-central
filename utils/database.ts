@@ -32,7 +32,7 @@ const logger = pino(
 );
 
 const childLogger = logger.child({
-	service: "prompt-central-api",
+	service: "promptcentral-api",
 	environment: NODE_ENV,
 });
 
@@ -77,7 +77,7 @@ export const connectToDb = async () => {
 			}/${MAX_RETRIES})...`,
 		);
 		await mongoose.connect(mongoUri, {
-			dbName: "prompt-central",
+			dbName: "promptcentral",
 			maxPoolSize: 10,
 			serverSelectionTimeoutMS: 5000,
 			socketTimeoutMS: 45000,

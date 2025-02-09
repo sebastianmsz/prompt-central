@@ -7,6 +7,7 @@ import { useSession, signIn } from "next-auth/react";
 import { Session } from "next-auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import JsonLd from "@components/JsonLd";
 
 const PromptCard: React.FC<Props> = ({
 	post,
@@ -115,6 +116,28 @@ const PromptCard: React.FC<Props> = ({
 		},
 		[handleTagClick],
 	);
+
+	const promptStructuredData = {
+		"@context": "https://schema.org",
+		"@type": "Article",
+		"headline": `AI Prompt by ${post.creator?.name}`,
+		"author": {
+			"@type": "Person",
+			"name": post.creator?.name,
+			"image": post.creator?.image
+		},
+		"description": post.prompt,
+		"keywords": post.tag.join(", "),
+		"datePublished": post._id ? new Date(parseInt(post._id.substring(0, 8), 16) * 1000).toISOString() : new Date().toISOString(),
+		"publisher": {
+			"@type": "Organization",
+			"name": "Prompt Central",
+			"logo": {
+				"@type": "ImageObject",
+				"url": `${process.env.NEXTAUTH_URL}/assets/img/logo.svg`
+			}
+		}
+	};
 
 	const renderUserInfo = () => (
 		<Link
@@ -248,6 +271,7 @@ const PromptCard: React.FC<Props> = ({
 
 	return (
 		<>
+			<JsonLd data={promptStructuredData} />
 			{isDeleteModalOpen && (
 				<div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-black bg-opacity-50 p-4">
 					<div className="w-full max-w-[95%] rounded-md bg-white p-4 shadow-lg dark:bg-dark-surface sm:w-96 sm:max-w-none sm:p-6">

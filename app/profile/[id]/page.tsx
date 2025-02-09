@@ -6,6 +6,29 @@ import Spinner from "@components/Spinner";
 import { Post } from "@types";
 import { useParams } from "next/navigation";
 import usePromptList from "@app/hooks/usePromptList";
+import { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/users/${params.id}`);
+    const { user } = await response.json();
+
+    return {
+      title: `${user.name}'s Profile`,
+      description: `Check out ${user.name}'s AI prompts and contributions on Prompt Central`,
+      openGraph: {
+        title: `${user.name}'s Profile | Prompt Central`,
+        description: `Discover AI prompts shared by ${user.name}`,
+        images: [user.image || '/assets/img/default-user.svg'],
+      },
+    };
+  } catch (error) {
+    return {
+      title: 'User Profile',
+      description: 'View user profile and their AI prompts on Prompt Central',
+    };
+  }
+}
 
 const UserProfile = () => {
 	const { id } = useParams<{ id: string }>();

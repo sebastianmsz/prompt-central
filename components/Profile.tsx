@@ -1,7 +1,8 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import PromptCard from "./PromptCard";
 import { ProfileProps } from "@types";
 import { useRouter } from "next/navigation";
+import JsonLd from "@components/JsonLd";
 
 const Profile: React.FC<ProfileProps> = ({
 	name,
@@ -15,11 +16,26 @@ const Profile: React.FC<ProfileProps> = ({
 
 	const handleTagClick = useCallback(
 		(tag: string) => {
-			console.log(`Tag clicked: ${tag}`);
 			router.push(`/?tag=${encodeURIComponent(tag)}`);
 		},
 		[router],
 	);
+
+	const profileStructuredData = {
+		"@context": "https://schema.org",
+		"@type": "ProfilePage",
+		"name": `${name}'s Profile`,
+		"description": desc,
+		"author": {
+			"@type": "Person",
+			"name": name
+		},
+		"interactionStatistic": {
+			"@type": "InteractionCounter",
+			"interactionType": "https://schema.org/WriteAction",
+			"userInteractionCount": data.length
+		}
+	};
 
 	const memoizedPromptCards = useMemo(
 		() =>
@@ -38,6 +54,7 @@ const Profile: React.FC<ProfileProps> = ({
 
 	return (
 		<section className="w-full">
+			<JsonLd data={profileStructuredData} />
 			<h1 className="head_text text-left">
 				<span className="blue_gradient">{name}&apos;s</span> profile
 			</h1>
